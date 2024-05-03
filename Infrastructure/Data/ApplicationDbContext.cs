@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Common;
@@ -15,29 +16,15 @@ namespace Infrastructure.Data
 
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)	{ }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder builder)
 		{
-			modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+			builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+			base.OnModelCreating(builder);
 		}
-
-		//public override Task<Int> SaveChangesAsync(CancellationToken cancellationToken = default)
-		//{
-		//	foreach (var entry in ChangeTracker.Entries<BaseEntity>())
-		//	{
-		//		entry.Entity.LastModifiedDate = DateTime.Now;
-
-		//		if(entry.State == EntityState.Added)
-		//		{
-		//			entry.Entity.CreatedDate = DateTime.Now;
-		//		}
-		//	}
-
-		//	return base.SaveChangesAsync(cancellationToken);
-		//}
 
 		public DbSet<Documentation> Documentations { get; set; }
 		public DbSet<User> Users { get; set; }
-
 
 	}
 }

@@ -6,16 +6,17 @@ using System.Threading.Tasks;
 using Application.Common;
 using AutoMapper;
 using Domain.Entities;
+using ErrorOr;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Authentication.Queries.Login
 {
-	public class LoginQuery : IRequest<AuthenticationResult>
+	public class LoginQuery : IRequest<ErrorOr<AuthenticationResult>>
 	{
 		public LoginDto LoginDto { get; set; }
 
-		public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthenticationResult>
+		public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResult>>
 		{
 			private readonly IJwtTokenGenerator _jwtTokenGenerator;
 			private readonly IApplicationDbContext _dbContext;
@@ -28,16 +29,16 @@ namespace Application.Authentication.Queries.Login
 				_jwtTokenGenerator = jwtTokenGenerator;
 			}
 
-			public async Task<AuthenticationResult> Handle(LoginQuery request, CancellationToken cancellationToken)
+			public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
 			{
 
 				// Checks if there exists a User with the given email
-				if (await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == request.LoginDto.Email) is not User user)
+				if (await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == query.LoginDto.Email) is not User user)
 				{
 					throw new Exception("User with given email already exists");
 				}
 
-				if (user.Password != request.LoginDto.Password)
+				if (user.Password != query.LoginDto.Password)
 				{
 					throw new Exception("Invalid Password");
 				}
@@ -49,7 +50,7 @@ namespace Application.Authentication.Queries.Login
 					user.Id,
 					user.FirstName,
 					user.LastName,
-					request.LoginDto.Email,
+					query.LoginDto.Email,
 					token
 				);
 
