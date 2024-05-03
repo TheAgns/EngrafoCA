@@ -1,5 +1,6 @@
 ﻿using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
+using WebUI.Common.Http;
 
 namespace WebUI.Controllers
 {
@@ -8,7 +9,7 @@ namespace WebUI.Controllers
 
         protected IActionResult Problem(List<Error> errors)
         {
-            HttpContext.Items["errors"] = errors;
+            HttpContext.Items[HttpContextItemKeys.Errors] = errors;
 
             var firstError = errors[0];
 

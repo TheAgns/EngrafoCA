@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common;
-using AutoMapper;
+﻿using Application.Common;
 using Domain.Entities;
 using ErrorOr;
 using MediatR;
@@ -12,49 +6,49 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Authentication.Queries.Login
 {
-	public class LoginQuery : IRequest<ErrorOr<AuthenticationResult>>
+	public record LoginQuery : IRequest<ErrorOr<AuthenticationResponse>>
 	{
-		public LoginDto LoginDto { get; set; }
+		public string Email { get; init; }
+		public string Password { get; init; }
 
-		public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResult>>
+	}
+
+	public class LoginQueryHandler : IRequestHandler<LoginQuery, ErrorOr<AuthenticationResponse>>
+	{
+		private readonly IJwtTokenGenerator _jwtTokenGenerator;
+		private readonly IApplicationDbContext _dbContext;
+
+		public LoginQueryHandler(IApplicationDbContext dbContext, IJwtTokenGenerator jwtTokenGenerator)
 		{
-			private readonly IJwtTokenGenerator _jwtTokenGenerator;
-			private readonly IApplicationDbContext _dbContext;
-			private readonly IMapper _mapper;
-
-			public LoginQueryHandler(IApplicationDbContext dbContext, IMapper mapper, IJwtTokenGenerator jwtTokenGenerator)
-			{
-				_dbContext = dbContext;
-				_mapper = mapper;
-				_jwtTokenGenerator = jwtTokenGenerator;
-			}
-
-			public async Task<ErrorOr<AuthenticationResult>> Handle(LoginQuery query, CancellationToken cancellationToken)
-			{
-
-				// Checks if there exists a User with the given email
-				if (await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == query.LoginDto.Email) is not User user)
-				{
-					throw new Exception("User with given email already exists");
-				}
-
-				if (user.Password != query.LoginDto.Password)
-				{
-					throw new Exception("Invalid Password");
-				}
-
-				var token = _jwtTokenGenerator.GenerateToken(user.Id, user.FirstName, user.LastName);
-
-				return new AuthenticationResult
-				(
-					user.Id,
-					user.FirstName,
-					user.LastName,
-					query.LoginDto.Email,
-					token
-				);
-
-			}
+			_dbContext = dbContext;
+			_jwtTokenGenerator = jwtTokenGenerator;
 		}
-    }
+
+		public async Task<ErrorOr<AuthenticationResponse>> Handle(LoginQuery query, CancellationToken cancellationToken)
+		{
+
+			// Checks if there exists a User with the given email
+			if (await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == query.Email) is not User user)
+			{
+				throw new Exception("User with given email already exists");
+			}
+
+			if (user.Password != query.Password)
+			{
+				throw new Exception("Invalid Password");
+			}
+
+			var token = _jwtTokenGenerator.GenerateToken(user.Id, user.FirstName, user.LastName);
+
+			return new AuthenticationResponse
+			(
+				user.Id,
+				user.FirstName,
+				user.LastName,
+				user.Email,
+				token
+			);
+
+		}
+	}
 }

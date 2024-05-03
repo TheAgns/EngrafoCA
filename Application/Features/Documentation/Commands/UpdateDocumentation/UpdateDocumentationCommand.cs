@@ -1,46 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common;
-using AutoMapper;
+﻿using Application.Common;
+using MapsterMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Documentation.Commands.UpdateDocumentation
 {
-    public class UpdateDocumentationCommand : IRequest<Unit>
-    {
-        public UpdateDocumentationDto UpdateDocumentationDto { get; set; }
+	public record UpdateDocumentationCommand : IRequest<Unit>
+	{
+		public Guid Id { get; init; }
+		public string Name { get; init; }
+		public string OwnerId { get; init; }
+		public int DocumentationCategoryId { get; init; }
+		public bool Hide { get; init; }
+		public bool ReadOnly { get; init; }
+	}
 
-		// Handler
-		public class UpdateDocumentationCommandHandler : IRequestHandler<UpdateDocumentationCommand, Unit>
+	// Handler
+	public class UpdateDocumentationCommandHandler : IRequestHandler<UpdateDocumentationCommand, Unit>
+	{
+		private readonly IApplicationDbContext _dbContext;
+		private readonly IMapper _mapper;
+
+		public UpdateDocumentationCommandHandler(IApplicationDbContext dbContext, IMapper mapper)
 		{
-			private readonly IApplicationDbContext _dbContext;
-			private readonly IMapper _mapper;
+			_dbContext = dbContext;
+			_mapper = mapper;
+		}
 
-			public UpdateDocumentationCommandHandler(IApplicationDbContext dbContext, IMapper mapper)
-			{
-				_dbContext = dbContext;
-				_mapper = mapper;
-			}
-
-			public async Task<Unit> Handle(UpdateDocumentationCommand request, CancellationToken cancellationToken)
-			{
-				// Validation
+		public async Task<Unit> Handle(UpdateDocumentationCommand request, CancellationToken cancellationToken)
+		{
+			// Validation
 
 
-				var documentation = await _dbContext.Documentations.FirstOrDefaultAsync(d => d.Id == request.UpdateDocumentationDto.Id);
-				_mapper.Map(request.UpdateDocumentationDto, documentation);
+			var documentation = await _dbContext.Documentations.FirstOrDefaultAsync(d => d.Id == request.Id);
+			_mapper.Map(request, documentation);
 
-				_dbContext.Documentations.Update(documentation);
+			_dbContext.Documentations.Update(documentation);
 
-				await _dbContext.SaveChangesAsync(cancellationToken);
+			await _dbContext.SaveChangesAsync(cancellationToken);
 
-				return Unit.Value;
+			return Unit.Value;
 
-			}
 		}
 	}
 }
+

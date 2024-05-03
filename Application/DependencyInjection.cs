@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Profiles;
+﻿using System.Reflection;
+using Application.Authentication;
+using Application.Authentication.Commands.RegisterNewUser;
+using Application.Common.Behaviors;
+using ErrorOr;
+using Mapster;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application
@@ -13,11 +13,12 @@ namespace Application
 	{
 		public static IServiceCollection AddApplication(this IServiceCollection services)
 		{
-			services.AddAutoMapper(Assembly.GetExecutingAssembly());
+			services.AddMapster();
 			services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-
+			services.AddScoped<IPipelineBehavior<RegisterNewUserCommand, 
+				ErrorOr<AuthenticationResponse>>, 
+				ValidateRegisterNewUserCommandBehavior>();
 			return services;
-
 		}
 	}
 }

@@ -4,47 +4,45 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Common;
-using Application.Features.Documentation.Validators;
-using AutoMapper;
+using MapsterMapper;
 using MediatR;
 
 namespace Application.Features.Documentation.Commands.CreateDocumentation
 {
-    public class CreateDocumentationCommand : IRequest<Guid>
-    {
-        public CreateDocumentationDto CreateDocumentationDto { get; set; }
+	public record CreateDocumentationCommand : IRequest<Guid>
+	{
+		public string Name { get; init; }
+		public string OwnerId { get; init; }
+		public int DocumentationTemplateId { get; init; }
+		public int DocumentationCategoryId { get; init; }
+		public bool Hide { get; init; }
+		public bool ReadOnly { get; init; }
+	}
 
-		// Handler
-		public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, Guid>
+	// Handler
+	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, Guid>
+	{
+		private readonly IApplicationDbContext _context;
+		private readonly IMapper _mapper;
+
+		public CreateDocumentationCommandHandler(IApplicationDbContext context, IMapper mapper)
 		{
-			private readonly IApplicationDbContext _context;
-			private readonly IMapper _mapper;
+			_context = context;
+			_mapper = mapper;
+		}
 
-			public CreateDocumentationCommandHandler(IApplicationDbContext context, IMapper mapper)
-			{
-				_context = context;
-				_mapper = mapper;
-			}
+		public async Task<Guid> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
+		{
+			
+			var documentation = _mapper.Map<Domain.Entities.Documentation>(request);
 
-			public async Task<Guid> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
-			{
-				var validator = new CreateDocumentationDtoValidator();
-				var validationresult = await validator.ValidateAsync(request.CreateDocumentationDto);
+			_context.Documentations.Add(documentation);
 
-				if (validationresult.IsValid == false)
-				{
-					throw new Exception();
-				}
+			await _context.SaveChangesAsync(cancellationToken);
 
-				var documentation = _mapper.Map<Domain.Entities.Documentation>(request.CreateDocumentationDto);
-
-				_context.Documentations.Add(documentation);
-
-				await _context.SaveChangesAsync(cancellationToken);
-
-				return documentation.Id;
-			}
+			return documentation.Id;
 		}
 	}
-       
 }
+
+

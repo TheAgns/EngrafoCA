@@ -13,6 +13,7 @@ namespace WebUI.Controllers
 		{
 			// Get Exception from HttpContext
 			Exception? exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
+			
 			var (statusCode, message) = exception switch
 			{
 				// If the exception is a DuplicateEmailException

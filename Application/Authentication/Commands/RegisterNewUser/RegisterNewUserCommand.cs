@@ -1,61 +1,62 @@
-﻿
-using Application.Common;
-using Application.Features.Documentation.Commands.CreateDocumentation;
-using Application.Features.Documentation.Validators;
-using AutoMapper;
+﻿using Application.Common;
 using Domain.Entities;
 using Domain.Errors;
 using ErrorOr;
+using MapsterMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Authentication.Commands.RegisterNewUser
 {
-    public class RegisterNewUserCommand : IRequest<ErrorOr<AuthenticationResult>>
+	public record RegisterNewUserCommand : IRequest<ErrorOr<AuthenticationResponse>>
 	{
-		public UserDto UserDto {  get; set; }
+		public string FirstName { get; init; }
+		public string LastName { get; init; }
+		public string Email { get; init; }
+		public string Password { get; init; }
 
-		public class RegisterNewUserCommandHandler : IRequestHandler<RegisterNewUserCommand, ErrorOr<AuthenticationResult>>
+	}
+
+	public class RegisterNewUserCommandHandler : IRequestHandler<RegisterNewUserCommand, ErrorOr<AuthenticationResponse>>
+	{
+		private readonly IApplicationDbContext _dbContext;
+		private readonly IMapper _mapper;
+		private readonly IJwtTokenGenerator _jwtTokenGenerator;
+
+		public RegisterNewUserCommandHandler(IApplicationDbContext dbContext, IMapper mapper, IJwtTokenGenerator jwtTokenGenerator)
 		{
-			private readonly IApplicationDbContext _dbContext;
-			private readonly IMapper _mapper;
-			private readonly IJwtTokenGenerator _jwtTokenGenerator;
+			_dbContext = dbContext;
+			_mapper = mapper;
+			_jwtTokenGenerator = jwtTokenGenerator;
+		}
 
-			public RegisterNewUserCommandHandler(IApplicationDbContext dbContext, IMapper mapper, IJwtTokenGenerator jwtTokenGenerator)
+		public async Task<ErrorOr<AuthenticationResponse>> Handle(RegisterNewUserCommand command, CancellationToken cancellationToken)
+		{
+			// Validation
+
+			// Checks if there exists a User with the given email
+			if (await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == command.Email) is null)
 			{
-				_dbContext = dbContext;
-				_mapper = mapper;
-				_jwtTokenGenerator = jwtTokenGenerator;
+				return Errors.User.DuplicateEmail;
 			}
 
-			public async Task<ErrorOr<AuthenticationResult>> Handle(RegisterNewUserCommand command, CancellationToken cancellationToken)
-			{
-				// Validation
+			var user = _mapper.Map<User>(command);
 
-				// Checks if there exists a User with the given email
-				if (await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == command.UserDto.Email) is null)
-				{
-					return Errors.User.DuplicateEmail;
-				}
+			_dbContext.Users.Add(user);
 
-				var user = _mapper.Map<User>(command.UserDto);
+			await _dbContext.SaveChangesAsync(cancellationToken);
 
-				_dbContext.Users.Add(user);
+			var token = _jwtTokenGenerator.GenerateToken(user.Id, user.FirstName, user.LastName);
 
-				await _dbContext.SaveChangesAsync(cancellationToken);
-
-				var token = _jwtTokenGenerator.GenerateToken(user.Id, user.FirstName, user.LastName);
-
-
-				return new AuthenticationResult
-				(
-					user.Id,
-					user.FirstName,
-					user.LastName,
-					user.Email,
-					token
-				);
-			}
+			//TODO: Refactor to not return any data (since it is a commmand)
+			return new AuthenticationResponse(
+				user.Id,
+				user.FirstName,
+				user.LastName,
+				user.Email,
+				token
+			);
 		}
 	}
+
 }

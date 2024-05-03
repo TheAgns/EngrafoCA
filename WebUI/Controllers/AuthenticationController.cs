@@ -4,50 +4,51 @@ using Application.Authentication.Queries.Login;
 using Domain.Errors;
 using ErrorOr;
 using MediatR;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebUI.Controllers
 {
-    [Route("auth")]
+	[Route("auth")]
 	public class AuthenticationController : BaseController
 	{
-		private readonly ISender _mediator;
-        public AuthenticationController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
-        [HttpPost("register")]
-		public async Task<IActionResult> Register(UserDto request)
+		private readonly ISender _sender;
+		public AuthenticationController(ISender sender)
 		{
-			var cmd = new RegisterNewUserCommand();
-			cmd.UserDto = request;
+			_sender = sender;
+		}
 
-			ErrorOr<AuthenticationResult> authRes = await _mediator.Send(cmd);
+		[HttpPost("register")]
+		public async Task<IActionResult> Register(RegisterNewUserCommand command)
+		{
+			ErrorOr<AuthenticationResponse> authRes = await _sender.Send(command);
 
 			if (authRes.IsError && authRes.FirstError == Errors.Authentication.InvalidCredentials)
 			{
-				return Problem(statusCode: StatusCodes.Status400BadRequest, title: authRes.FirstError.Description);
+				return Problem(
+					statusCode: StatusCodes.Status400BadRequest,
+					title: authRes.FirstError.Description);
 			}
 
-			return Ok(authRes);
+			return authRes.Match(
+				authRes => Ok(authRes),
+				errors => Problem(errors));
 		}
 
 		[HttpPost("login")]
-		public async Task<IActionResult> Login(LoginDto request)
+		public async Task<IActionResult> Login(LoginQuery query)
 		{
-			var qry = new LoginQuery();
-			qry.LoginDto = request;
+			ErrorOr<AuthenticationResponse> authRes = await _sender.Send(query);
 
-			ErrorOr<AuthenticationResult> authRes = await _mediator.Send(qry);
-			
 			if (authRes.IsError && authRes.FirstError == Errors.Authentication.InvalidCredentials)
 			{
-				return Problem(statusCode: StatusCodes.Status401Unauthorized, title: authRes.FirstError.Description);
+				return Problem(
+					statusCode: StatusCodes.Status401Unauthorized,
+					title: authRes.FirstError.Description);
 			}
 
-			return Ok(authRes);
+			return authRes.Match(
+				authRes => Ok(authRes),
+				errors => Problem(errors));
 		}
 	}
 }
