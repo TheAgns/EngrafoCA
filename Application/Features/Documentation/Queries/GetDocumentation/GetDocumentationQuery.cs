@@ -1,11 +1,13 @@
 ﻿using Application.Common;
+using Domain.Errors;
+using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Documentation.Queries.GetDocumentation
 {
-	public record GetDocumentationQuery : IRequest<DocumentationDto>
+    public record GetDocumentationQuery : IRequest<DocumentationDto>
 	{
 		public Guid Id { get; set; }
 
@@ -26,6 +28,8 @@ namespace Application.Features.Documentation.Queries.GetDocumentation
 			var documentation = await _context.Documentations
 				.AsNoTracking()
 				.SingleOrDefaultAsync(d => d.Id == request.Id);
+
+			//Return or throw exception here
 
 			return _mapper.Map<DocumentationDto>(documentation);
 		}

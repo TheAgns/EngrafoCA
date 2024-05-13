@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common;
+﻿using Application.Common;
+using ErrorOr;
 using MapsterMapper;
 using MediatR;
 
@@ -33,7 +29,9 @@ namespace Application.Features.Documentation.Commands.CreateDocumentation
 
 		public async Task<Guid> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
 		{
-			
+
+			await Task.CompletedTask;
+
 			var documentation = _mapper.Map<Domain.Entities.Documentation>(request);
 
 			_context.Documentations.Add(documentation);

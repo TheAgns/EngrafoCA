@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Documentations";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="text-center">
+    @foreach(var doc in Model)
+    {
+        <p>@doc.Name</p>
+    }
+</div>

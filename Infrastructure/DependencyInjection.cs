@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common;
+﻿using Application.Common;
 using Infrastructure.Common;
-using Infrastructure.Identity.Authentication;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Protocols;
+
 
 namespace Infrastructure
 {
@@ -18,10 +14,16 @@ namespace Infrastructure
 			this IServiceCollection services,
 			IConfigurationManager configuration)
 		{
-			// Maps the jwt settings in the appsettings.json from the WebUI project
-			services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
-			services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
+			services.AddDbContext<ApplicationDbContext>(options =>
+				options.UseSqlServer(
+					configuration.GetConnectionString("Default")));
+
+			services.AddScoped<IApplicationDbContext>(sp =>
+				sp.GetRequiredService<ApplicationDbContext>());
+
 			services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
 			return services;
 		}
 	}

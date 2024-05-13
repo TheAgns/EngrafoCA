@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
-using Application.Authentication;
-using Application.Authentication.Commands.RegisterNewUser;
 using Application.Common.Behaviors;
-using ErrorOr;
+using FluentValidation;
 using Mapster;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,12 +11,22 @@ namespace Application
 	{
 		public static IServiceCollection AddApplication(this IServiceCollection services)
 		{
+			// Mapping
 			services.AddMapster();
+
+			// MediatR
 			services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-			services.AddScoped<IPipelineBehavior<RegisterNewUserCommand, 
-				ErrorOr<AuthenticationResponse>>, 
-				ValidateRegisterNewUserCommandBehavior>();
-			return services;
+
+			// Validation Interceptor using MediatR pipeline
+			services.AddScoped(
+				typeof(IPipelineBehavior<,>), 
+				typeof(ValidationBehavior<,>));
+
+			// FluentValidation
+			services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+			
+
+            return services;
 		}
 	}
 }
