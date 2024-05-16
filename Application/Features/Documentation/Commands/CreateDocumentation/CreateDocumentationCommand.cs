@@ -1,22 +1,21 @@
 ﻿using Application.Common;
+using Domain.Documentation.ValueObjects;
 using ErrorOr;
 using MapsterMapper;
 using MediatR;
 
 namespace Application.Features.Documentation.Commands.CreateDocumentation
 {
-	public record CreateDocumentationCommand : IRequest<Guid>
+    public record CreateDocumentationCommand : IRequest<DocumentationId>
 	{
 		public string Name { get; init; }
-		public string OwnerId { get; init; }
-		public int DocumentationTemplateId { get; init; }
-		public int DocumentationCategoryId { get; init; }
+		public Guid DocumentationTemplateId { get; init; }
 		public bool Hide { get; init; }
 		public bool ReadOnly { get; init; }
 	}
 
 	// Handler
-	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, Guid>
+	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, DocumentationId>
 	{
 		private readonly IApplicationDbContext _context;
 		private readonly IMapper _mapper;
@@ -27,12 +26,10 @@ namespace Application.Features.Documentation.Commands.CreateDocumentation
 			_mapper = mapper;
 		}
 
-		public async Task<Guid> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
+		public async Task<DocumentationId> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
 		{
 
-			await Task.CompletedTask;
-
-			var documentation = _mapper.Map<Domain.Entities.Documentation>(request);
+			var documentation = _mapper.Map<Domain.Documentation.Documentation>(request);
 
 			_context.Documentations.Add(documentation);
 

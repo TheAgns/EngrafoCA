@@ -25,7 +25,7 @@ namespace Application.Features.Documentation.Queries.GetDocumentations
                 .Select(d => _mapper.Map<DocumentationDto>(d))
                 .ToListAsync();            
 
-            //Return or throw Exception here
+            // Return or throw Exception here
             if (documentations.IsNullOrEmpty())
             {
                 throw new Exception();
