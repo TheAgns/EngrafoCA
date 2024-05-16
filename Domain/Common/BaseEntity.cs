@@ -4,18 +4,14 @@
         where TId : notnull
 	{
 		public TId Id { get; protected set; }
-        public DateTime Created { get; protected set; }
-        public string? CreatedBy { get; protected set; }
-
-        public DateTimeOffset LastModified { get; protected set; }
-
-        public string? LastModifiedBy { get; protected set; }
 
         protected BaseEntity(TId id)
         {
             Id = id;
-            Created = DateTime.Now;
-            LastModified = DateTimeOffset.Now;
+        }
+        protected BaseEntity()
+        {
+
         }
         public override bool Equals(object? obj)
         {
@@ -27,11 +23,15 @@
             return Equals((object?)other);
         }
 
-        public static bool operator ==(BaseEntity<TId>? a, BaseEntity<TId>? b) =>
-            (a == b);
+        public static bool operator ==(BaseEntity<TId> left, BaseEntity<TId> right)
+        {
+            return Equals(left, right);
+        }
 
-        public static bool operator !=(BaseEntity<TId>? a, BaseEntity<TId>? b) =>
-            !(a == b);
+        public static bool operator !=(BaseEntity<TId> left, BaseEntity<TId> right)
+        {
+            return !Equals(left, right);
+        }
 
         public override int GetHashCode()
         {
