@@ -7,15 +7,21 @@ namespace Domain.DocumentationTemplate
     {
         public string Title { get; private set; }
 
-        // Entity or ValueObject?
-        private readonly List<DocumentationTemplateHeading> _templateHeadings = new();
+        private readonly List<DocumentationTemplateHeading> _documentationTemplateHeadings = new List<DocumentationTemplateHeading>();
 
-        public IReadOnlyList<DocumentationTemplateHeading> TemplateHeadings => _templateHeadings.ToList();
+        public IReadOnlyList<DocumentationTemplateHeading> DocumentationTemplateHeadings => _documentationTemplateHeadings.AsReadOnly();
 
-        private DocumentationTemplate(DocumentationTemplateId id, string title, List<DocumentationTemplateHeading> templateHeadings) : base(id)
+        private DocumentationTemplate() { }
+
+        public void AddHeading(DocumentationTemplateHeading heading)
+        {
+            _documentationTemplateHeadings.Add(heading);
+        }
+
+        public DocumentationTemplate(DocumentationTemplateId id, string title, List<DocumentationTemplateHeading> templateHeadings) : base(id)
         {
             Title = title;
-            _templateHeadings = templateHeadings;
+            _documentationTemplateHeadings = templateHeadings;
         }
 
         public static DocumentationTemplate Create(string title, List<DocumentationTemplateHeading> templateHeadings)

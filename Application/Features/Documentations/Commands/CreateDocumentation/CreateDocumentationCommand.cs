@@ -17,7 +17,7 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 		public Guid DocumentationTemplateId { get; init; }
 		public string Category {  get; init; }
 
-		public List<DocumentationHeadingContent> DocumentationHeadingContents { get; init; }
+		public List<DocumentationItem> DocumentationItems { get; init; }
 		public bool Hidden { get; init; }
 		public bool ReadOnly { get; init; }
 	}
@@ -40,11 +40,10 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 			var doc = Documentation.Create(
 				name: request.Name,
 				templateId: DocumentationTemplateId.New(request.DocumentationTemplateId),				
-				documentationHeadingContents: request.DocumentationHeadingContents.ConvertAll(
-					dc => DocumentationHeadingContent.Create(
+				documentationItems: request.DocumentationItems.ConvertAll(
+					dc => DocumentationItem.Create(
 						dc.Content,
-						dc.Position,
-						dc.ContentType)
+						dc.Position)
 					),
 				readOnly: request.ReadOnly,
 				hidden: request.Hidden

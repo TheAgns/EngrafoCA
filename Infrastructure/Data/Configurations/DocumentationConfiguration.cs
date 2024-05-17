@@ -12,7 +12,7 @@ namespace Infrastructure.Data.Configurations
         public void Configure(EntityTypeBuilder<Documentation> builder)
         {
             ConfigureDocumentationsTable(builder);
-            ConfigureDocumentationHeadingContentsTable(builder);
+            ConfigureDocumentationItemsTable(builder);
         }
 
         private void ConfigureDocumentationsTable(EntityTypeBuilder<Documentation> builder)
@@ -37,31 +37,30 @@ namespace Infrastructure.Data.Configurations
                 id => id.Value,
                 value => DocumentationTemplateId.New(value));
 
-            //! Populates the public ReadOnlyList<DocumentationHeadingContent>
-            builder.Metadata.FindNavigation(nameof(Documentation.DocumentationHeadingContents))!.SetPropertyAccessMode(PropertyAccessMode.Field);
+            //! Populates the public ReadOnlyList<DocumentationItem>
+            builder.Metadata.FindNavigation(nameof(Documentation.DocumentationItems))!.SetPropertyAccessMode(PropertyAccessMode.Field);
         }
 
-        private void ConfigureDocumentationHeadingContentsTable(EntityTypeBuilder<Documentation> builder)
+        private void ConfigureDocumentationItemsTable(EntityTypeBuilder<Documentation> builder)
         {
-            builder.OwnsMany(d => d.DocumentationHeadingContents, dhc =>
+            builder.OwnsMany(d => d.DocumentationItems, di =>
             {
-                dhc.ToTable("DocumentationHeadingContents");
+                di.ToTable("DocumentationItems");
 
-                dhc.WithOwner().HasForeignKey("DocumentationId");
+                di.WithOwner().HasForeignKey("DocumentationId");
 
                 //! Sets the composite key for the entity inside the aggregate
-                dhc.HasKey(nameof(DocumentationHeadingContent.Id), "DocumentationId");
+                di.HasKey(nameof(DocumentationItem.Id), "DocumentationId");
 
-                dhc.Property(dhc => dhc.Id)
-                    .HasColumnName("DocumentationHeadingContentId")
+                di.Property(di => di.Id)
+                    .HasColumnName("DocumentationItemId")
                     .ValueGeneratedNever()
                     .HasConversion(
                     id => id.Value,
-                    value => DocumentationHeadingContentId.New(value));
+                    value => DocumentationItemId.New(value));
 
-                dhc.Property(dhc => dhc.Content).IsRequired();
-                dhc.Property(dhc => dhc.Position).IsRequired();
-                dhc.Property(dhc => dhc.ContentType).IsRequired();
+                di.Property(dhc => dhc.Content).IsRequired();
+                di.Property(dhc => dhc.Position).IsRequired();
             });
         }
     }

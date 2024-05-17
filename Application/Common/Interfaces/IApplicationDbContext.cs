@@ -8,6 +8,7 @@ namespace Application.Common.Interfaces
     public interface IApplicationDbContext
     {
         DbSet<Documentation> Documentations { get; }
+        DbSet<DocumentationTemplate> DocumentationTemplates { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

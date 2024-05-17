@@ -7,6 +7,8 @@ namespace Domain.DocumentationTemplate.ValueObjects
         public string Title { get; private set; }
         public int Position { get; private set; }
 
+        private DocumentationTemplateHeading() {}
+
         private DocumentationTemplateHeading(string title, int position)
         {
             Title = title;

@@ -2,7 +2,6 @@
 using Application.Common.Interfaces;
 using Domain.DocumentationAggregate;
 using Domain.DocumentationTemplate;
-using Domain.DocumentationTemplate.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -21,5 +20,6 @@ namespace Infrastructure.Data
 
 
 		public DbSet<Documentation> Documentations { get; set; }
+		public DbSet<DocumentationTemplate> DocumentationTemplates { get; set; }
     }
 }

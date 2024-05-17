@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240516212347_Initial")]
+    [Migration("20240517175331_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -49,22 +49,40 @@ namespace Infrastructure.Migrations
                     b.ToTable("Documentations", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.DocumentationTemplate.DocumentationTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DocumentationTemplates", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"),
+                            Title = "Template1"
+                        });
+                });
+
             modelBuilder.Entity("Domain.DocumentationAggregate.Documentation", b =>
                 {
-                    b.OwnsMany("Domain.DocumentationAggregate.Entities.DocumentationHeadingContent", "DocumentationHeadingContents", b1 =>
+                    b.OwnsMany("Domain.DocumentationAggregate.Entities.DocumentationItem", "DocumentationItems", b1 =>
                         {
                             b1.Property<Guid>("Id")
                                 .HasColumnType("uniqueidentifier")
-                                .HasColumnName("DocumentationHeadingContentId");
+                                .HasColumnName("DocumentationItemId");
 
                             b1.Property<Guid>("DocumentationId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Content")
-                                .IsRequired()
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("ContentType")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
@@ -75,7 +93,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasIndex("DocumentationId");
 
-                            b1.ToTable("DocumentationHeadingContents", (string)null);
+                            b1.ToTable("DocumentationItems", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("DocumentationId");
@@ -101,7 +119,56 @@ namespace Infrastructure.Migrations
                     b.Navigation("Category")
                         .IsRequired();
 
-                    b.Navigation("DocumentationHeadingContents");
+                    b.Navigation("DocumentationItems");
+                });
+
+            modelBuilder.Entity("Domain.DocumentationTemplate.DocumentationTemplate", b =>
+                {
+                    b.OwnsMany("Domain.DocumentationTemplate.ValueObjects.DocumentationTemplateHeading", "DocumentationTemplateHeadings", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("DocumentationTemplateId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Position")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("DocumentationTemplateId");
+
+                            b1.ToTable("DocumentationTemplateHeadings", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("DocumentationTemplateId");
+
+                            b1.HasData(
+                                new
+                                {
+                                    Id = 1,
+                                    DocumentationTemplateId = new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"),
+                                    Position = 1,
+                                    Title = "Heading1"
+                                },
+                                new
+                                {
+                                    Id = 2,
+                                    DocumentationTemplateId = new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"),
+                                    Position = 2,
+                                    Title = "Heading2"
+                                });
+                        });
+
+                    b.Navigation("DocumentationTemplateHeadings");
                 });
 #pragma warning restore 612, 618
         }
