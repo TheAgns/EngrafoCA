@@ -11,13 +11,6 @@ namespace Domain.DocumentationTemplate
 
         public IReadOnlyList<DocumentationTemplateHeading> DocumentationTemplateHeadings => _documentationTemplateHeadings.AsReadOnly();
 
-        private DocumentationTemplate() { }
-
-        public void AddHeading(DocumentationTemplateHeading heading)
-        {
-            _documentationTemplateHeadings.Add(heading);
-        }
-
         public DocumentationTemplate(DocumentationTemplateId id, string title, List<DocumentationTemplateHeading> templateHeadings) : base(id)
         {
             Title = title;
@@ -28,5 +21,7 @@ namespace Domain.DocumentationTemplate
         {
             return new(DocumentationTemplateId.CreateUnique(), title, templateHeadings);
         }
+
+        private DocumentationTemplate() { }
     }
 }

@@ -20,7 +20,6 @@ namespace Infrastructure.Data.Configurations
 
             builder.HasKey(t => t.Id);
 
-            //! Defines how the id is saved and retrieved
             builder.Property(t => t.Id)
                 .ValueGeneratedNever()
                 .HasConversion(
@@ -43,7 +42,8 @@ namespace Infrastructure.Data.Configurations
                 th.Property(th => th.Title).IsRequired();
                 th.Property(th => th.Position).IsRequired();
 
-                th.HasKey("Id");
+                //! Change back to "Id" if doesnt work
+                th.HasKey("Id", "DocumentationTemplateId");
             });
         }
 
@@ -66,14 +66,14 @@ namespace Infrastructure.Data.Configurations
                     DocumentationTemplateId = template.Id,
                     Id = 1,
                     Title = "Heading1",
-                    Position = 1,
+                    Position = 0,
                 },
                 new
                 {
                     DocumentationTemplateId = template.Id,
                     Id = 2,
                     Title = "Heading2",
-                    Position = 2,
+                    Position = 1,
                 });
 
         }

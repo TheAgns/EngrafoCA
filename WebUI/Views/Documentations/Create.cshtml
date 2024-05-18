@@ -1,0 +1,56 @@
+﻿@using WebUI.Models
+@model CreateDocumentationViewModel
+@{
+    ViewData["Title"] = "Create Documentation";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="Name">Name</label>
+        <input type="text" id="Name" name="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="Template">Select Template</label>
+        <select id="Template" name="DocumentationTemplateId" class="form-control">
+            <option value="">-- Select a Template --</option>
+            @foreach (var template in Model.DocumentationTemplates)
+            {
+                <option value="@template.Id">@template.Title</option>
+            }
+        </select>
+        <span asp-validation-for="DocumentationTemplateId" class="text-danger"></span>
+    </div>
+
+    <div id="template-headings" class="mb-3">
+        <!-- Headings will be populated here -->
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+@section Scripts {
+    <script>
+        document.getElementById('Template').addEventListener('change', function () {
+            var selectedTemplateId = this.value;
+            fetch(`/Documentations/GetTemplateHeadings?templateId=${selectedTemplateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    var headingsDiv = document.getElementById('template-headings');
+                    headingsDiv.innerHTML = '';
+                    data.forEach((heading, headingIndex) => {
+                        var headingContainer = document.createElement('div');
+                        headingContainer.classList.add('heading-container');
+                        headingContainer.innerHTML = `
+                                    <label>${heading.title}</label>
+                                    <input type="text" name="DocumentationItems[${headingIndex}].Content" class="form-control" />
+                                    <input type="hidden" name="DocumentationItems[${headingIndex}].Position" value="${headingIndex}" />
+                                `;
+                        headingsDiv.appendChild(headingContainer);
+                    });
+                });
+        });
+    </script>
+}

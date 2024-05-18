@@ -4,14 +4,12 @@ namespace Application.Features.Documentations.Queries
 {
     public class DocumentationDto : BaseDto
     {
-        public string Name { get; set; }
-        public List<DocumentationHeadingContentDto> DocumentationHeadingContents { get; set; }
+        public string Name { get; init; }
+        public List<DocumentationItemDto> DocumentationItems { get; set; }
 
-        public string DocumentationTemplateId { get; set; }
+        public Guid DocumentationTemplateId { get; init; }
 
-        public DateTime? Created {  get; set; }
-
-        public DateTimeOffset? LastModified { get; set; }
-
+        public bool ReadOnly { get; init; }
+        public bool Hidden { get; init; }
     }
 }

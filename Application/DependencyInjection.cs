@@ -3,6 +3,7 @@ using Application.Common.Behaviors;
 using FluentValidation;
 using Mapster;
 using MediatR;
+using Application.Common.Mapping;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application
@@ -13,6 +14,9 @@ namespace Application
 		{
 			// Mapping
 			services.AddMapster();
+
+			// Adds the Mapping Configurations
+			services.AddMappings();
 
 			// MediatR
 			services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));

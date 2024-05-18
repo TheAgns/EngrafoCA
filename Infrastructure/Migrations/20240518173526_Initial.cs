@@ -67,13 +67,13 @@ namespace Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    DocumentationTemplateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Position = table.Column<int>(type: "int", nullable: false),
-                    DocumentationTemplateId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Position = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DocumentationTemplateHeadings", x => x.Id);
+                    table.PrimaryKey("PK_DocumentationTemplateHeadings", x => new { x.Id, x.DocumentationTemplateId });
                     table.ForeignKey(
                         name: "FK_DocumentationTemplateHeadings_DocumentationTemplates_DocumentationTemplateId",
                         column: x => x.DocumentationTemplateId,
@@ -85,15 +85,15 @@ namespace Infrastructure.Migrations
             migrationBuilder.InsertData(
                 table: "DocumentationTemplates",
                 columns: new[] { "Id", "Title" },
-                values: new object[] { new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"), "Template1" });
+                values: new object[] { new Guid("f843bcd9-57ed-46aa-b65b-fcaeb1eb9628"), "Template1" });
 
             migrationBuilder.InsertData(
                 table: "DocumentationTemplateHeadings",
-                columns: new[] { "Id", "DocumentationTemplateId", "Position", "Title" },
+                columns: new[] { "DocumentationTemplateId", "Id", "Position", "Title" },
                 values: new object[,]
                 {
-                    { 1, new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"), 1, "Heading1" },
-                    { 2, new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"), 2, "Heading2" }
+                    { new Guid("f843bcd9-57ed-46aa-b65b-fcaeb1eb9628"), 1, 0, "Heading1" },
+                    { new Guid("f843bcd9-57ed-46aa-b65b-fcaeb1eb9628"), 2, 1, "Heading2" }
                 });
 
             migrationBuilder.CreateIndex(

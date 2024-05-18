@@ -1,5 +1,29 @@
-﻿@{
-	ViewData["Title"] = "Details";
+﻿@using WebUI.Models
+@model DocumentationDetailsViewModel
+
+@{
+    ViewData["Title"] = "Details";
 }
 
 <h1>@ViewData["Title"]</h1>
+
+<p>Name: @Model.Documentation.Name</p>
+
+@if (Model.DocumentationTemplateHeadings != null && Model.DocumentationTemplateHeadings.Any())
+{
+    <h2>Template Headings</h2>
+    <ul>
+        @foreach (var heading in Model.DocumentationTemplateHeadings)
+        {
+            <li>
+                <strong>@heading.Title</strong>
+                <ul>
+                    @foreach (var item in Model.Documentation.DocumentationItems.Where(di => di.Position == heading.Position))
+                    {
+                        <li>@item.Content</li>
+                    }
+                </ul>
+            </li>
+        }
+    </ul>
+}

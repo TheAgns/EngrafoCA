@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using System.Diagnostics;
+using Application.Common.Interfaces;
 using Domain.DocumentationAggregate.ValueObjects;
 using ErrorOr;
 using MapsterMapper;
@@ -9,7 +10,7 @@ namespace Application.Features.Documentations.Queries.GetDocumentation
 {
     public record GetDocumentationQuery : IRequest<DocumentationDto>
 	{
-		public Guid Id { get; set; }
+		public Guid Id { get; init; }
 
 	}
 
@@ -24,14 +25,22 @@ namespace Application.Features.Documentations.Queries.GetDocumentation
 			_mapper = mapper;
 		}
 		public async Task<DocumentationDto> Handle(GetDocumentationQuery request, CancellationToken cancellationToken)
-		{
-			var documentation = await _context.Documentations
-				.AsNoTracking()
-				.SingleOrDefaultAsync(d => d.Id.Value == request.Id);
+		{	
+			Debug.WriteLine(request.Id);
 
-			//Return or throw exception here
+            var docId = DocumentationId.New(request.Id);
 
-			return _mapper.Map<DocumentationDto>(documentation);
+            var doc = await _context.Documentations
+                .AsNoTracking()
+                .SingleOrDefaultAsync(d => d.Id == docId, cancellationToken);
+
+            //Return or throw exception here
+            if (doc is null)
+			{
+				throw new Exception("No Documentation with that id was found");
+			}
+
+			return _mapper.Map<DocumentationDto>(doc);
 		}
 	}
 }

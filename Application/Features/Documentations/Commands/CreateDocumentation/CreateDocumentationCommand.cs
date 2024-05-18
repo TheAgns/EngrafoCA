@@ -1,4 +1,6 @@
-﻿using Application.Common.Interfaces;
+﻿using System.Diagnostics;
+using Application.Common.Interfaces;
+using Application.Features.Documentations.Queries;
 using Domain.DocumentationAggregate;
 using Domain.DocumentationAggregate.Entities;
 using Domain.DocumentationAggregate.ValueObjects;
@@ -16,8 +18,7 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 		public string Name { get; init; }
 		public Guid DocumentationTemplateId { get; init; }
 		public string Category {  get; init; }
-
-		public List<DocumentationItem> DocumentationItems { get; init; }
+		public List<DocumentationItemDto> DocumentationItems { get; init; }
 		public bool Hidden { get; init; }
 		public bool ReadOnly { get; init; }
 	}
@@ -37,7 +38,13 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 		public async Task<Guid> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
 		{
 
-			var doc = Documentation.Create(
+            foreach (var item in request.DocumentationItems)
+            {
+                Debug.WriteLine("Item Content: " + item.Content);
+                Debug.WriteLine("Item Position: " + item.Position);
+            }
+
+            var doc = Documentation.Create(
 				name: request.Name,
 				templateId: DocumentationTemplateId.New(request.DocumentationTemplateId),				
 				documentationItems: request.DocumentationItems.ConvertAll(

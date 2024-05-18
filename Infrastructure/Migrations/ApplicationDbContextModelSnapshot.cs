@@ -63,7 +63,7 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"),
+                            Id = new Guid("f843bcd9-57ed-46aa-b65b-fcaeb1eb9628"),
                             Title = "Template1"
                         });
                 });
@@ -139,7 +139,7 @@ namespace Infrastructure.Migrations
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
-                            b1.HasKey("Id");
+                            b1.HasKey("Id", "DocumentationTemplateId");
 
                             b1.HasIndex("DocumentationTemplateId");
 
@@ -152,15 +152,15 @@ namespace Infrastructure.Migrations
                                 new
                                 {
                                     Id = 1,
-                                    DocumentationTemplateId = new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"),
-                                    Position = 1,
+                                    DocumentationTemplateId = new Guid("f843bcd9-57ed-46aa-b65b-fcaeb1eb9628"),
+                                    Position = 0,
                                     Title = "Heading1"
                                 },
                                 new
                                 {
                                     Id = 2,
-                                    DocumentationTemplateId = new Guid("b25303f2-5aa4-4b0d-be98-99e2e9764c23"),
-                                    Position = 2,
+                                    DocumentationTemplateId = new Guid("f843bcd9-57ed-46aa-b65b-fcaeb1eb9628"),
+                                    Position = 1,
                                     Title = "Heading2"
                                 });
                         });

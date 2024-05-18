@@ -18,9 +18,4 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\DocumentationTemplate\Commands\CreateDocumentationTemplate\" />
-    <Folder Include="Features\DocumentationTemplate\Queries\GetDocumentationTemplates\" />
-  </ItemGroup>
-
 </Project>

@@ -6,11 +6,11 @@ namespace Domain.DocumentationAggregate.Entities
     public sealed class DocumentationItem : BaseEntity<DocumentationItemId>
     {
         // TODO: Make Enum and conversion
-        public string ContentType { get; } 
+        //public string ContentType { get; private set; } 
 
-        public string Content { get; }
+        public string Content { get; private set; }
 
-        public int Position { get; }
+        public int Position { get; private set; }
 
         private DocumentationItem() {}
 

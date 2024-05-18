@@ -21,8 +21,6 @@ namespace Domain.DocumentationAggregate
 
         public DocumentationTemplateId TemplateId { get; private set; }
 
-        private Documentation() {}
-
         public Documentation(DocumentationId id, string name, DocumentationTemplateId templateId, List<DocumentationItem> documentationItems, bool readOnly, bool hidden) : base(id)
         {
             Name = name;
@@ -37,5 +35,8 @@ namespace Domain.DocumentationAggregate
         {
             return new(DocumentationId.CreateUnique(), name, templateId , documentationItems, readOnly, hidden);
         }
+
+        private Documentation() {}
+
     }
 }
