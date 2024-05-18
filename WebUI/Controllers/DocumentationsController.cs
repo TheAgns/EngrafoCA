@@ -32,8 +32,7 @@ namespace WebUI.Controllers
         }
 
         // Documentation Details
-        // Documentation Details
-        [HttpGet("{id}")]
+        [HttpGet("Documentation/Details/{id}")]
         public async Task<IActionResult> Details(Guid id)
         {
             var documentation = await _sender.Send(new GetDocumentationQuery { Id = id });
