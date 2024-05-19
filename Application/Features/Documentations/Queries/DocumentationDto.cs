@@ -1,4 +1,4 @@
-﻿using Application.Common;
+﻿using Application.Common.Abstractions;
 
 namespace Application.Features.Documentations.Queries
 {

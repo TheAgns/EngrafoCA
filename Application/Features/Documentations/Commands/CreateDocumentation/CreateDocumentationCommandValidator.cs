@@ -6,9 +6,9 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
     {
         public CreateDocumentationCommandValidator()
         {
-            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required");
             RuleFor(x => x.Name).NotNull();
-            RuleFor(x => x.DocumentationTemplateId).NotEmpty();
+            RuleFor(x => x.DocumentationTemplateId).NotEmpty().WithMessage("A Template must be selected");
             RuleFor(x => x.DocumentationTemplateId).NotNull();
         }
     }

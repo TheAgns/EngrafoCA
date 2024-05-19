@@ -3,6 +3,7 @@ using Application.Features.Documentations.Commands.CreateDocumentation;
 using Application.Features.Documentations.Queries.GetDocumentation;
 using Application.Features.Documentations.Queries.GetDocumentations;
 using Application.Features.DocumentationTemplates.Queries.GetDocumentationTemplates;
+using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -36,13 +37,24 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var documentation = await _sender.Send(new GetDocumentationQuery { Id = id });
-            var templateId = documentation.DocumentationTemplateId; // Assuming you have access to the template ID
+
+            //! Checks if the handler returned an error and redirects to ErrorController
+            if (documentation.IsError)
+            {
+
+				var error = documentation.FirstError;
+				var errorViewModel = new ErrorViewModel(error.Code, error.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+            }
+
+            var templateId = documentation.Value.DocumentationTemplateId;
             var template = await _sender.Send(new GetDocumentationTemplatesQuery());
             var selectedTemplate = template.FirstOrDefault(t => t.Id == templateId);
 
             var vm = new DocumentationDetailsViewModel
             {
-                Documentation = documentation,
+                Documentation = documentation.Value,
                 DocumentationTemplateHeadings = selectedTemplate.DocumentationTemplateHeadings
             };
 
@@ -67,10 +79,10 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Create(CreateDocumentationCommand command)
         {
 
-			var result = await _sender.Send(command);
+            var result = await _sender.Send(command);
 
-			return RedirectToAction("Details", new { Id = result });
-		}
+            return RedirectToAction("Details", new { Id = result });
+        }
 
         // Method for generating the headings from the selected template
         [HttpGet]
@@ -87,6 +99,6 @@ namespace WebUI.Controllers
         }
 
 
-        
+
     }
 }

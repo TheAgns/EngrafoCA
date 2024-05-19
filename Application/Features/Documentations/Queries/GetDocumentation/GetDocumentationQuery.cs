@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Application.Common.Interfaces;
+using Domain.Common.Errors;
 using Domain.DocumentationAggregate.ValueObjects;
 using ErrorOr;
 using MapsterMapper;
@@ -8,14 +9,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Documentations.Queries.GetDocumentation
 {
-    public record GetDocumentationQuery : IRequest<DocumentationDto>
+    public record GetDocumentationQuery : IRequest<ErrorOr<DocumentationDto>>
 	{
 		public Guid Id { get; init; }
 
 	}
 
 	// Handler
-	public class GetDocumentationQueryHandler : IRequestHandler<GetDocumentationQuery, DocumentationDto>
+	public class GetDocumentationQueryHandler : IRequestHandler<GetDocumentationQuery, ErrorOr<DocumentationDto>>
 	{
 		private readonly IApplicationDbContext _context;
 		private readonly IMapper _mapper;
@@ -24,7 +25,7 @@ namespace Application.Features.Documentations.Queries.GetDocumentation
 			_context = context;
 			_mapper = mapper;
 		}
-		public async Task<DocumentationDto> Handle(GetDocumentationQuery request, CancellationToken cancellationToken)
+		public async Task<ErrorOr<DocumentationDto>> Handle(GetDocumentationQuery request, CancellationToken cancellationToken)
 		{	
 			Debug.WriteLine(request.Id);
 
@@ -37,7 +38,7 @@ namespace Application.Features.Documentations.Queries.GetDocumentation
             //Return or throw exception here
             if (doc is null)
 			{
-				throw new Exception("No Documentation with that id was found");
+				return Errors.Documentation.DocumentationNotFound;
 			}
 
 			return _mapper.Map<DocumentationDto>(doc);

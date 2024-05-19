@@ -9,7 +9,7 @@ namespace Domain.Common.Errors
             public static Error DocumentationNotFound =>
                 Error.NotFound(
                     code: "Documentation.NotFound",
-                    description: "Documentation could not be found.");
+                    description: "Documentation with the given id could not be found.");
         }
     }
 }

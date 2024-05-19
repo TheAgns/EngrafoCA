@@ -1,4 +1,4 @@
-﻿namespace Application.Common
+﻿namespace Application.Common.Abstractions
 {
     public abstract class BaseDto
     {
