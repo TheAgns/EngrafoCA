@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common.Interfaces;
-using Application.Features.Documentations.Queries;
+﻿using Application.Common.Interfaces;
+using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Domain.Common.Errors;
 
 namespace Application.Features.DocumentationTemplates.Queries.GetDocumentationTemplates
 {
-    public record GetDocumentationTemplatesQuery : IRequest<List<DocumentationTemplateDto>>
+    public record GetDocumentationTemplatesQuery : IRequest<ErrorOr<List<DocumentationTemplateDto>>>
     {
     }
 
     // Handler
-    public class GetDocumentationTemplatesQueryHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<GetDocumentationTemplatesQuery, List<DocumentationTemplateDto>>
+    public class GetDocumentationTemplatesQueryHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<GetDocumentationTemplatesQuery, ErrorOr<List<DocumentationTemplateDto>>>
     {
         private readonly IApplicationDbContext _context = context;
         private readonly IMapper _mapper = mapper;
 
-        public async Task<List<DocumentationTemplateDto>> Handle(GetDocumentationTemplatesQuery request, CancellationToken cancellationToken)
+        public async Task<ErrorOr<List<DocumentationTemplateDto>>> Handle(GetDocumentationTemplatesQuery request, CancellationToken cancellationToken)
         {
             var templates = await _context.DocumentationTemplates
                 .AsNoTracking()
@@ -36,6 +33,11 @@ namespace Application.Features.DocumentationTemplates.Queries.GetDocumentationTe
 
                 })
             .ToListAsync(cancellationToken);
+
+            if (templates.IsNullOrEmpty()) 
+            {
+                return Errors.DocumentationTemplate.TemplateNotFound;
+            }
 
             return templates;
         

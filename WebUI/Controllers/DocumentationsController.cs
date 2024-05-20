@@ -1,13 +1,11 @@
-﻿using System.Diagnostics;
-using Application.Features.Documentations.Commands.CreateDocumentation;
+﻿using Application.Features.Documentations.Commands.CreateDocumentation;
 using Application.Features.Documentations.Queries.GetDocumentation;
 using Application.Features.Documentations.Queries.GetDocumentations;
+using Application.Features.DocumentationTemplates.Queries.GetDocumentationTemplate;
 using Application.Features.DocumentationTemplates.Queries.GetDocumentationTemplates;
-using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using WebUI.Models;
 
 namespace WebUI.Controllers
@@ -29,7 +27,14 @@ namespace WebUI.Controllers
         {
             var result = await _sender.Send(new GetDocumentationsQuery());
 
-            return View(result);
+            if (result.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(result.FirstError.Code, result.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
+            return View(result.Value);
         }
 
         // Documentation Details
@@ -38,24 +43,33 @@ namespace WebUI.Controllers
         {
             var documentation = await _sender.Send(new GetDocumentationQuery { Id = id });
 
-            //! Checks if the handler returned an error and redirects to ErrorController
+            /*! Checks if the handler returned an error
+                and creates an ErrorViewModel
+                and redirects it to the ErrorController
+            */
             if (documentation.IsError)
             {
-
-				var error = documentation.FirstError;
-				var errorViewModel = new ErrorViewModel(error.Code, error.Description);
+				var errorViewModel = new ErrorViewModel(documentation.FirstError.Code, documentation.FirstError.Description);
 				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
 				return RedirectToAction("Error", "Error");
             }
 
+            //TODO: REFACTOR
+
             var templateId = documentation.Value.DocumentationTemplateId;
-            var template = await _sender.Send(new GetDocumentationTemplatesQuery());
-            var selectedTemplate = template.FirstOrDefault(t => t.Id == templateId);
+            var template = await _sender.Send(new GetDocumentationTemplateQuery { Id = templateId});
+
+            if (template.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(template.FirstError.Code, template.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
 
             var vm = new DocumentationDetailsViewModel
             {
                 Documentation = documentation.Value,
-                DocumentationTemplateHeadings = selectedTemplate.DocumentationTemplateHeadings
+                DocumentationTemplateHeadings = template.Value.DocumentationTemplateHeadings
             };
 
             return View(vm);
@@ -66,9 +80,17 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Create()
         {
             var templates = await _sender.Send(new GetDocumentationTemplatesQuery());
+
+            if (templates.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(templates.FirstError.Code, templates.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
             var vm = new CreateDocumentationViewModel
             {
-                DocumentationTemplates = templates
+                DocumentationTemplates = templates.Value
             };
 
             return View(vm);
@@ -88,14 +110,16 @@ namespace WebUI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTemplateHeadings(Guid templateId)
         {
-            var template = await _sender.Send(new GetDocumentationTemplatesQuery());
-            var selectedTemplate = template.FirstOrDefault(t => t.Id == templateId);
-            if (selectedTemplate == null)
-            {
-                return NotFound();
-            }
+            var template = await _sender.Send(new GetDocumentationTemplateQuery() { Id = templateId});
 
-            return Json(selectedTemplate.DocumentationTemplateHeadings);
+            if (template.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(template.FirstError.Code, template.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
+            return Json(template.Value.DocumentationTemplateHeadings);
         }
 
 
