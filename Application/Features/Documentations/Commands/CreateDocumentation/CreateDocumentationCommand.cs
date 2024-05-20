@@ -50,7 +50,7 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 				hidden: request.Hidden
 				);
 
-			_context.Documentations.Add(doc);
+			await _context.Documentations.AddAsync(doc);
 
 			var numOfEntries = await _context.SaveChangesAsync(cancellationToken);
 

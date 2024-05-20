@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Infrastructure.Interceptors
 {
-	public class PublishDomainEventInterceptor : SaveChangesInterceptor
+	public class PublishDomainEventsInterceptor : SaveChangesInterceptor
 	{
 		private readonly IPublisher _publisher;
 
-        public PublishDomainEventInterceptor(IPublisher publisher)
+        public PublishDomainEventsInterceptor(IPublisher publisher)
         {
             _publisher = publisher;
         }
