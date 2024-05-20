@@ -1,9 +1,13 @@
-﻿namespace Domain.Common
+﻿namespace Domain.Common.Abstractions
 {
-    public abstract class BaseEntity<TId> : IEquatable<BaseEntity<TId>> 
+    public abstract class BaseEntity<TId> : IEquatable<BaseEntity<TId>>, IHasDomainEvents
         where TId : notnull
-	{
-		public TId Id { get; protected set; }
+    {
+        public TId Id { get; protected set; }
+
+        private readonly List<IDomainEvent> _domainEvents = new();
+
+        public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
         protected BaseEntity(TId id)
         {
@@ -12,6 +16,16 @@
         protected BaseEntity()
         {
 
+        }
+
+		public void ClearDomainEvents()
+		{
+			_domainEvents.Clear();
+		}
+
+		public void AddDomainEvent(IDomainEvent domainEvent)
+        {
+            _domainEvents.Add(domainEvent);
         }
         public override bool Equals(object? obj)
         {
@@ -38,7 +52,8 @@
             return Id.GetHashCode();
         }
 
-    }
 		
-	
+	}
+
+
 }

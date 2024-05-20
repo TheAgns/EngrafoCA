@@ -1,4 +1,4 @@
-﻿using Domain.Common;
+﻿using Domain.Common.Abstractions;
 using Domain.DocumentationAggregate.ValueObjects;
 
 namespace Domain.DocumentationAggregate.Entities
