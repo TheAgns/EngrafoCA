@@ -1,13 +1,10 @@
-﻿using System.Diagnostics;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Features.Documentations.Queries;
 using Domain.Common.Errors;
 using Domain.DocumentationAggregate;
 using Domain.DocumentationAggregate.Entities;
-using Domain.DocumentationAggregate.ValueObjects;
 using Domain.DocumentationTemplate.ValueObjects;
 using ErrorOr;
-using MapsterMapper;
 using MediatR;
 
 namespace Application.Features.Documentations.Commands.CreateDocumentation
@@ -28,12 +25,10 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, ErrorOr<Guid>>
 	{
 		private readonly IApplicationDbContext _context;
-		private readonly IMapper _mapper;
 
-		public CreateDocumentationCommandHandler(IApplicationDbContext context, IMapper mapper)
+		public CreateDocumentationCommandHandler(IApplicationDbContext context)
 		{
 			_context = context;
-			_mapper = mapper;
 		}
 
 		public async Task<ErrorOr<Guid>> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)

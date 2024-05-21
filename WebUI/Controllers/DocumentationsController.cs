@@ -100,7 +100,6 @@ namespace WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateDocumentationCommand command)
         {
-
             var result = await _sender.Send(command);
 
             return RedirectToAction("Details", new { Id = result });
