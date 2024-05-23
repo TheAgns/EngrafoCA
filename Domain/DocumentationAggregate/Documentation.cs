@@ -1,5 +1,6 @@
-﻿using Domain.Common;
+﻿using Domain.Common.Abstractions;
 using Domain.DocumentationAggregate.Entities;
+using Domain.DocumentationAggregate.Events;
 using Domain.DocumentationAggregate.ValueObjects;
 using Domain.DocumentationTemplate.ValueObjects;
 
@@ -33,7 +34,11 @@ namespace Domain.DocumentationAggregate
 
         public static Documentation Create(string name, DocumentationTemplateId templateId, List<DocumentationItem> documentationItems, bool readOnly, bool hidden)
         {
-            return new(DocumentationId.CreateUnique(), name, templateId , documentationItems, readOnly, hidden);
+            var documentation = new Documentation(DocumentationId.CreateUnique(), name, templateId, documentationItems, readOnly, hidden);
+
+            documentation.AddDomainEvent(new DocumentationCreatedEvent(documentation));
+
+            return documentation;
         }
 
         private Documentation() {}

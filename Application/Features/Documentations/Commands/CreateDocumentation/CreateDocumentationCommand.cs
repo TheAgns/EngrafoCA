@@ -1,19 +1,17 @@
-﻿using System.Diagnostics;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Features.Documentations.Queries;
+using Domain.Common.Errors;
 using Domain.DocumentationAggregate;
 using Domain.DocumentationAggregate.Entities;
-using Domain.DocumentationAggregate.ValueObjects;
 using Domain.DocumentationTemplate.ValueObjects;
 using ErrorOr;
-using MapsterMapper;
 using MediatR;
 
 namespace Application.Features.Documentations.Commands.CreateDocumentation
 {
 	//! Implement mapping from command to entity
 	//? Maybe create a DTO instead of direct properties in Command
-    public record CreateDocumentationCommand : IRequest<Guid>
+    public record CreateDocumentationCommand : IRequest<ErrorOr<Guid>>
 	{
 		public string Name { get; init; }
 		public Guid DocumentationTemplateId { get; init; }
@@ -24,26 +22,17 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 	}
 
 	// Handler
-	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, Guid>
+	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, ErrorOr<Guid>>
 	{
 		private readonly IApplicationDbContext _context;
-		private readonly IMapper _mapper;
 
-		public CreateDocumentationCommandHandler(IApplicationDbContext context, IMapper mapper)
+		public CreateDocumentationCommandHandler(IApplicationDbContext context)
 		{
 			_context = context;
-			_mapper = mapper;
 		}
 
-		public async Task<Guid> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
+		public async Task<ErrorOr<Guid>> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
 		{
-
-            foreach (var item in request.DocumentationItems)
-            {
-                Debug.WriteLine("Item Content: " + item.Content);
-                Debug.WriteLine("Item Position: " + item.Position);
-            }
-
             var doc = Documentation.Create(
 				name: request.Name,
 				templateId: DocumentationTemplateId.New(request.DocumentationTemplateId),				
@@ -56,9 +45,14 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 				hidden: request.Hidden
 				);
 
-			_context.Documentations.Add(doc);
+			await _context.Documentations.AddAsync(doc);
 
-			await _context.SaveChangesAsync(cancellationToken);
+			var numOfEntries = await _context.SaveChangesAsync(cancellationToken);
+
+			if (numOfEntries != 1)
+			{
+				return Errors.Documentation.DocumentationNotCreated;
+			}
 
 			return doc.Id.Value;
 		}

@@ -1,12 +1,11 @@
-﻿using System.Diagnostics;
-using Application.Features.Documentations.Commands.CreateDocumentation;
+﻿using Application.Features.Documentations.Commands.CreateDocumentation;
 using Application.Features.Documentations.Queries.GetDocumentation;
 using Application.Features.Documentations.Queries.GetDocumentations;
+using Application.Features.DocumentationTemplates.Queries.GetDocumentationTemplate;
 using Application.Features.DocumentationTemplates.Queries.GetDocumentationTemplates;
 using MapsterMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using WebUI.Models;
 
 namespace WebUI.Controllers
@@ -28,7 +27,14 @@ namespace WebUI.Controllers
         {
             var result = await _sender.Send(new GetDocumentationsQuery());
 
-            return View(result);
+            if (result.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(result.FirstError.Code, result.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
+            return View(result.Value);
         }
 
         // Documentation Details
@@ -36,14 +42,34 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var documentation = await _sender.Send(new GetDocumentationQuery { Id = id });
-            var templateId = documentation.DocumentationTemplateId; // Assuming you have access to the template ID
-            var template = await _sender.Send(new GetDocumentationTemplatesQuery());
-            var selectedTemplate = template.FirstOrDefault(t => t.Id == templateId);
+
+            /*! Checks if the handler returned an error
+                and creates an ErrorViewModel
+                and redirects it to the ErrorController
+            */
+            if (documentation.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(documentation.FirstError.Code, documentation.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+            }
+
+            //TODO: REFACTOR
+
+            var templateId = documentation.Value.DocumentationTemplateId;
+            var template = await _sender.Send(new GetDocumentationTemplateQuery { Id = templateId});
+
+            if (template.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(template.FirstError.Code, template.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
 
             var vm = new DocumentationDetailsViewModel
             {
-                Documentation = documentation,
-                DocumentationTemplateHeadings = selectedTemplate.DocumentationTemplateHeadings
+                Documentation = documentation.Value,
+                DocumentationTemplateHeadings = template.Value.DocumentationTemplateHeadings
             };
 
             return View(vm);
@@ -54,9 +80,17 @@ namespace WebUI.Controllers
         public async Task<IActionResult> Create()
         {
             var templates = await _sender.Send(new GetDocumentationTemplatesQuery());
+
+            if (templates.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(templates.FirstError.Code, templates.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
             var vm = new CreateDocumentationViewModel
             {
-                DocumentationTemplates = templates
+                DocumentationTemplates = templates.Value
             };
 
             return View(vm);
@@ -66,27 +100,28 @@ namespace WebUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateDocumentationCommand command)
         {
+            var result = await _sender.Send(command);
 
-			var result = await _sender.Send(command);
-
-			return RedirectToAction("Details", new { Id = result });
-		}
+            return RedirectToAction("Details", new { Id = result });
+        }
 
         // Method for generating the headings from the selected template
         [HttpGet]
         public async Task<IActionResult> GetTemplateHeadings(Guid templateId)
         {
-            var template = await _sender.Send(new GetDocumentationTemplatesQuery());
-            var selectedTemplate = template.FirstOrDefault(t => t.Id == templateId);
-            if (selectedTemplate == null)
-            {
-                return NotFound();
-            }
+            var template = await _sender.Send(new GetDocumentationTemplateQuery() { Id = templateId});
 
-            return Json(selectedTemplate.DocumentationTemplateHeadings);
+            if (template.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(template.FirstError.Code, template.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
+            return Json(template.Value.DocumentationTemplateHeadings);
         }
 
 
-        
+
     }
 }

@@ -1,4 +1,4 @@
-﻿using Domain.Common;
+﻿using Domain.Common.Abstractions;
 
 namespace Domain.DocumentationTemplate.ValueObjects
 {

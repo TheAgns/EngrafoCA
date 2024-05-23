@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Infrastructure.Common;
 using Infrastructure.Data;
+using Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,8 @@ namespace Infrastructure
 				sp.GetRequiredService<ApplicationDbContext>());
 
 			services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+			services.AddScoped<PublishDomainEventsInterceptor>();
 
 			return services;
 		}
