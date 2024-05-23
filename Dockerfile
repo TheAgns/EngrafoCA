@@ -18,4 +18,4 @@ EXPOSE 443
 #COPY --from=build-env /App/out .
 
 # RUN ls -la /App
-ENTRYPOINT ["dotnet", "WebUI.dll"]
+ENTRYPOINT ["dotnet", "/src/WebUI/WebUI/bin/Release/net8.0/WebUI.dll"]
