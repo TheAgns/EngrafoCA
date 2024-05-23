@@ -22,15 +22,15 @@
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /src
-COPY ["src/WebUI/WebUI.csproj", "src/WebUI/"]
-COPY ["src/Core/Application.csproj", "src/Application/"]
-COPY ["src/Core/Domain.csproj", "src/Domain/"]
-COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
+COPY ["WebUI.csproj", "WebUI/"]
+COPY ["Application.csproj", "Application/"]
+COPY ["Domain.csproj", "Domain/"]
+COPY ["Infrastructure.csproj", "Infrastructure/"]
 
 
-RUN dotnet restore "src/WebUI/WebUI.csproj"
+RUN dotnet restore "WebUI.csproj"
 COPY . ../
-WORKDIR /src/WebUI
+WORKDIR /WebUI
 RUN dotnet build "WebUI.csproj" -c Release -o /app/build
 FROM build-env AS publish
 RUN dotnet publish --no-restore -c Release -o /app/publish
