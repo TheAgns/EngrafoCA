@@ -1,0 +1,46 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration)'
+
+
+- script: dotnet test --logger "trx;LogFileName=test_results.trx" --collect "Code Coverage" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+  displayName: 'Run unit tests'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: '**/test_results.trx'
+    testRunTitle: 'Unit Tests'
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+
+- task: Docker@2
+  displayName: 'Build and push Docker image to container registry'
+  inputs:
+    containerRegistry: 'engrafo-service-con'
+    repository: 'engrafoRepo'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(Build.BuildId)
