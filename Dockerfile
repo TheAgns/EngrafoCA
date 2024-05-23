@@ -1,8 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /App
+WORKDIR /src
 
 # Copy everything
-COPY . ./
+# COPY . ./
+COPY ["./build", "."]
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
@@ -12,9 +13,9 @@ EXPOSE 80
 EXPOSE 443
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /App
-COPY --from=build-env /App/out .
+#FROM mcr.microsoft.com/dotnet/aspnet:8.0
+#WORKDIR /App
+#COPY --from=build-env /App/out .
 
 RUN ls -la /App
-ENTRYPOINT ["dotnet", "Application.dll"]
+ENTRYPOINT ["dotnet", "DotNet.Docker.dll"]
