@@ -2,8 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /src
 
 # Copy everything
-# COPY . ./
-COPY ["./build", "."]
+COPY . ./
+
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
