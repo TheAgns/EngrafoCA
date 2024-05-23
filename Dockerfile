@@ -20,7 +20,7 @@
 # RUN ls -la /App
 #ENTRYPOINT ["dotnet", "/src/WebUI/WebUI/bin/Release/net8.0/WebUI.dll"]
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /src
 COPY ["src/WebUI/WebUI.csproj", "WebUI/"]
 COPY ["src/Core/Application.csproj", "Application/"]
