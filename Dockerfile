@@ -17,5 +17,5 @@ EXPOSE 443
 #WORKDIR /App
 #COPY --from=build-env /App/out .
 
-RUN ls -la /App
+# RUN ls -la /App
 ENTRYPOINT ["dotnet", "DotNet.Docker.dll"]
