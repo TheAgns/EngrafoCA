@@ -23,7 +23,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["src/WebUI/WebUI.csproj", "WebUI/"]
-COPY ["src/Core/Application/Application.csproj", "Application/"]
+COPY ["src/Core/Application.csproj", "Application/"]
 COPY ["src/Core/Domain.csproj", "Domain/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "Infrastructure/"]
 
