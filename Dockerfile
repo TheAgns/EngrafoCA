@@ -25,7 +25,7 @@ WORKDIR ./
 COPY ["WebUI.csproj", "WebUI/"]
 COPY ["Application.csproj", "Application/"]
 COPY ["Domain.csproj", "Domain/"]
-COPY ["Infrastructure.csproj", "Infrastructure/"]
+#COPY ["Infrastructure.csproj", "Infrastructure/"]
 
 
 RUN dotnet restore "WebUI.csproj"
