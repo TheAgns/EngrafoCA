@@ -21,7 +21,7 @@
 #ENTRYPOINT ["dotnet", "/src/WebUI/WebUI/bin/Release/net8.0/WebUI.dll"]
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /src
+WORKDIR ./
 COPY ["WebUI.csproj", "WebUI/"]
 COPY ["Application.csproj", "Application/"]
 COPY ["Domain.csproj", "Domain/"]
