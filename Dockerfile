@@ -18,4 +18,4 @@ EXPOSE 443
 #COPY --from=build-env /App/out .
 
 # RUN ls -la /App
-ENTRYPOINT ["dotnet", "EngrafoCA.dll"]
+ENTRYPOINT ["dotnet", "WebUI.dll"]
