@@ -32,7 +32,7 @@ RUN dotnet restore "WebUI/WebUI.csproj"
 COPY . ../
 WORKDIR /src/WebUI
 RUN dotnet build "WebUI.csproj" -c Release -o /app/build
-FROM build AS publish
+FROM build-env AS publish
 RUN dotnet publish --no-restore -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 ENV ASPNETCORE_HTTP_PORTS=80
