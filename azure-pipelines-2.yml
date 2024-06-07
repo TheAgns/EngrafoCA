@@ -52,7 +52,7 @@ stages:
             displayName: Deploy to Azure Web App
             inputs:
               azureSubscription: 'Azure subscription 1(5b29b677-49cc-4b4e-b24b-b59a527eb479)'
-              appName: 'EngrafoDocker'
+              appName: 'EngrafoCA'
               containers: 'engrafocadocker.azurecr.io/theagnsengrafoca:$(Build.BuildId)'
 #- task: AzureWebAppContainer@1
 #  inputs:
