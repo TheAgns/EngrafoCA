@@ -37,3 +37,25 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+- stage: Deploy
+  displayName: Deploy stage
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy to Azure Web App
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureWebAppContainer@1
+            displayName: Deploy to Azure Web App
+            inputs:
+              azureSubscription: 'Azure subscription 1(5b29b677-49cc-4b4e-b24b-b59a527eb479)'
+              appName: 'EngrafoDocker'
+              containers: 'engrafocadocker.azurecr.io/theagnsengrafoca:$(Build.BuildId)'
+#- task: AzureWebAppContainer@1
+#  inputs:
+#    azureSubscription: 'Azure subscription 1(5b29b677-49cc-4b4e-b24b-b59a527eb479)'
+#    appName: 'EngrafoDocker'
+#    containers: 'engrafocadocker.azurecr.io/theagnsengrafoca:$(Build.BuildId)'
