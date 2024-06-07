@@ -45,6 +45,9 @@ RUN dotnet publish -c Release -o /app/publish
 FROM base AS runtime
 WORKDIR /app
 
+EXPOSE 80
+EXPOSE 443
+
 COPY --from=publish /app/publish .
 RUN ls -l
 ENTRYPOINT [ "dotnet", "WebUI.dll" ]
