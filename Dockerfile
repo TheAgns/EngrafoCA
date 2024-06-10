@@ -22,11 +22,11 @@ WORKDIR /app
 COPY --from=build-env /app/out .
 
 # Expose the port the application runs on
-EXPOSE 81
+EXPOSE 80
 EXPOSE 443
 
 # Set environment variable to listen on port 81
-ENV ASPNETCORE_URLS=http://+:81
+ENV ASPNETCORE_URLS=http://+:80
 
 # Set the entry point to run the application (Without db migrations)
 ENTRYPOINT ["dotnet", "WebUI.dll"]
