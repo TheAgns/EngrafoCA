@@ -11,8 +11,6 @@ builder.Services
 	.AddApplication()
 	.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddApplicationInsightsTelemetry();
-
 //! Logging
 Log.Logger = new LoggerConfiguration()
 	.ReadFrom.Configuration(builder.Configuration).CreateLogger();
