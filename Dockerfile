@@ -26,7 +26,7 @@ EXPOSE 80
 EXPOSE 443
 
 # Set environment variable to listen on port 81
-ENV ASPNETCORE_URLS=http://+:80
+ENV ASPNETCORE_URLS="http://+:80;https://+:443"
 
 # Set the entry point to run the application (Without db migrations)
 ENTRYPOINT ["dotnet", "WebUI.dll"]
