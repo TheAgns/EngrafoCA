@@ -29,17 +29,17 @@ if (!app.Environment.IsDevelopment())
 	app.UseHsts();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-	var provider = scope.ServiceProvider;
+//using (var scope = app.Services.CreateScope())
+//{
+//	var provider = scope.ServiceProvider;
 
-	var context = provider.GetRequiredService<ApplicationDbContext>();
+//	var context = provider.GetRequiredService<ApplicationDbContext>();
 
-	if (context.Database.GetMigrations().Any())
-	{
-		context.Database.Migrate();
-	}
-}
+//	if (context.Database.GetMigrations().Any())
+//	{
+//		context.Database.Migrate();
+//	}
+//}
 
 app.UseHttpsRedirection();
 
