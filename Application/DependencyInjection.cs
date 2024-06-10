@@ -5,6 +5,7 @@ using Mapster;
 using MediatR;
 using Application.Common.Mapping;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Application
 {
@@ -25,6 +26,8 @@ namespace Application
 			services.AddScoped(
 				typeof(IPipelineBehavior<,>), 
 				typeof(ValidationBehavior<,>));
+
+			services.AddSerilog();
 
 			// Logging Interceptor using MediatR pipeline
 			services.AddScoped(

@@ -16,6 +16,7 @@ namespace Application.Common.Behaviors
 		where TRequest : IRequest<TResponse>
 		where TResponse : IErrorOr
 	{
+		// Encapsulates the validation logic of the command/query (request)
 		private readonly ILogger<RequestLogPipelineBehavior<TRequest, TResponse>> _logger;
 
 		public RequestLogPipelineBehavior(ILogger<RequestLogPipelineBehavior<TRequest, TResponse>> logger)
@@ -23,9 +24,16 @@ namespace Application.Common.Behaviors
 			_logger = logger;
 		}
 
+		// If there are no validation errors, we invoke the handler
+
+		/* If there are validation errors, we convert the validationRes to a list of ErrorOr
+		   and return them.
+		 */
 		public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
 		{
-						if (_logger is null)
+			// If no validator is defined for the command/query
+			// just invoke the handler
+			if (_logger is null)
 			{
 				return await next();
 			}
@@ -39,11 +47,16 @@ namespace Application.Common.Behaviors
 			
 			if (response.IsError)
 			{
+				var errorName = response.Errors.First().Code;
+
 				using (LogContext.PushProperty("Error", response.Errors.First(), true))
-					_logger.LogError("Completed Request: {requestName} with error", requestName);
+					_logger.LogError("Completed Request: {requestName}, with error: {errorName}", requestName, errorName);
 			}
 
-			_logger.LogInformation("Completed Request: {requestName}", requestName);
+			if (!response.IsError)
+			{
+				_logger.LogInformation("Completed Request: {requestName}", requestName);
+			}			
 
 			// This invokes the handler
 			return response;

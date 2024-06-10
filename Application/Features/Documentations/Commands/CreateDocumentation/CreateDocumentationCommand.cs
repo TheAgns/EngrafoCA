@@ -6,6 +6,7 @@ using Domain.DocumentationAggregate.Entities;
 using Domain.DocumentationTemplate.ValueObjects;
 using ErrorOr;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Documentations.Commands.CreateDocumentation
 {
@@ -25,10 +26,12 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, ErrorOr<Guid>>
 	{
 		private readonly IApplicationDbContext _context;
+		private readonly ILogger<CreateDocumentationCommandHandler> _logger;
 
-		public CreateDocumentationCommandHandler(IApplicationDbContext context)
+		public CreateDocumentationCommandHandler(IApplicationDbContext context, ILogger<CreateDocumentationCommandHandler> logger)
 		{
 			_context = context;
+			_logger = logger;
 		}
 
 		public async Task<ErrorOr<Guid>> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
@@ -51,7 +54,7 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 			// Domain Event is published on SaveChangesAsync
 			var numOfEntries = await _context.SaveChangesAsync(cancellationToken);
 
-			if (numOfEntries != 1)
+			if (numOfEntries < 1)
 			{
 				return Errors.Documentation.DocumentationNotCreated;
 			}

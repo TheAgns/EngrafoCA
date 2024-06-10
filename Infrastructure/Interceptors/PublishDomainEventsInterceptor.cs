@@ -2,16 +2,16 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Interceptors
 {
 	public class PublishDomainEventsInterceptor : SaveChangesInterceptor
 	{
 		private readonly IPublisher _publisher;
-		private readonly ILogger _logger;
+		private readonly ILogger<PublishDomainEventsInterceptor> _logger;
 
-        public PublishDomainEventsInterceptor(IPublisher publisher, ILogger logger)
+        public PublishDomainEventsInterceptor(IPublisher publisher, ILogger<PublishDomainEventsInterceptor> logger)
         {
             _publisher = publisher;
 			_logger = logger;
@@ -45,9 +45,9 @@ namespace Infrastructure.Interceptors
 			// Then we publish the domainEvents that we extracted
 			foreach (var domainEvent in domainEvents)
 			{
-				var eventType = typeof(IDomainEvent).Assembly.GetName().Name;
-				_logger.Information("Publishing Domain Event: {eventType}", eventType);
+				var eventType = domainEvent.GetType().Name;
 				await _publisher.Publish(domainEvent);
+				_logger.LogInformation("Published Domain Event: {eventType}", eventType);
 			}
 
 		}

@@ -6,6 +6,7 @@ using ErrorOr;
 using MapsterMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Documentations.Queries.GetDocumentation
 {
@@ -20,16 +21,16 @@ namespace Application.Features.Documentations.Queries.GetDocumentation
 	{
 		private readonly IApplicationDbContext _context;
 		private readonly IMapper _mapper;
-		public GetDocumentationQueryHandler(IApplicationDbContext context, IMapper mapper)
+		private ILogger<GetDocumentationQueryHandler> _logger;
+		public GetDocumentationQueryHandler(IApplicationDbContext context, IMapper mapper, ILogger<GetDocumentationQueryHandler> logger)
 		{
 			_context = context;
 			_mapper = mapper;
+			_logger = logger;
 		}
 		public async Task<ErrorOr<DocumentationDto>> Handle(GetDocumentationQuery request, CancellationToken cancellationToken)
-		{	
-			Debug.WriteLine(request.Id);
-
-            var docId = DocumentationId.New(request.Id);
+		{
+			var docId = DocumentationId.New(request.Id);
 
             var doc = await _context.Documentations
                 .AsNoTracking()

@@ -47,6 +47,7 @@ namespace WebUI.Controllers
                 and creates an ErrorViewModel
                 and redirects it to the ErrorController
             */
+
             if (documentation.IsError)
             {
 				var errorViewModel = new ErrorViewModel(documentation.FirstError.Code, documentation.FirstError.Description);
@@ -109,7 +110,7 @@ namespace WebUI.Controllers
 				return RedirectToAction("Error", "Error");
 			}
 
-            return RedirectToAction("Details", new { Id = result });
+            return RedirectToAction("Details", new { Id = result.Value });
         }
 
         // Method for generating the headings from the selected template
