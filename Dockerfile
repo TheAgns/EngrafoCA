@@ -1,78 +1,32 @@
-#FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-#WORKDIR /app
-
-# Copy everything
-#COPY . ./
-
-# Restore as distinct layers
-#RUN dotnet restore
-# Build and publish a release
-#RUN dotnet publish -c Release -o out
-
-#EXPOSE 80
-#EXPOSE 443
-
-# Build runtime image
-#FROM mcr.microsoft.com/dotnet/aspnet:8.0
-#WORKDIR /App
-#COPY --from=build-env /App/out .
-
-# RUN ls -la /App
-#ENTRYPOINT ["dotnet", "/src/WebUI/WebUI/bin/Release/net8.0/WebUI.dll"]
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
+# Stage 1: Build the application
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
+# Copy the .csproj files and restore dependencies
+COPY ./WebUI/WebUI.csproj ./WebUI/
+COPY ./Application/Application.csproj ./Application/
+COPY ./Infrastructure/Infrastructure.csproj ./Infrastructure/
+COPY ./Domain/Domain.csproj ./Domain/
 
-COPY ["./Application/Application.csproj", "src/Application/"]
-COPY ["./Domain/Domain.csproj", "src/Domain/"]
-COPY ["./Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
-COPY ["./WebUI/WebUI.csproj", "src/WebUI/"]
+RUN dotnet restore ./WebUI/WebUI.csproj
 
-RUN dotnet restore "src/WebUI/WebUI.csproj"
-
+# Copy the rest of the application code
 COPY . ./
 
-WORKDIR /src
+# Build the application
+RUN dotnet publish ./WebUI/WebUI.csproj -c Release -o out
 
-RUN dotnet build -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish
-
-FROM base AS runtime
+# Stage 2: Build the runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 as runtime
 WORKDIR /app
+COPY --from=build-env /app/out .
 
-EXPOSE 80
+# Expose the port the application runs on
+EXPOSE 81
 EXPOSE 443
 
-COPY --from=publish /app/publish .
-RUN ls -l
-ENTRYPOINT [ "dotnet", "WebUI.dll" ]
+# Set environment variable to listen on port 81
+ENV ASPNETCORE_URLS=http://+:81
 
-
-
-
-
-#WORKDIR /EngrafoCA
-#COPY ["WebUI.csproj", "WebUI/"]
-#COPY ["Application.csproj", "Application/"]
-#COPY ["Domain.csproj", "Domain/"]
-#COPY ["Infrastructure.csproj", "Infrastructure/"]
-
-
-#RUN dotnet restore "WebUI.csproj"
-#COPY . ../
-#WORKDIR /WebUI
-#RUN dotnet build "WebUI.csproj" -c Release -o /app/build
-#FROM build-env AS publish
-#RUN dotnet publish --no-restore -c Release -o /app/publish
-#FROM mcr.microsoft.com/dotnet/aspnet:8.0
-#ENV ASPNETCORE_HTTP_PORTS=80
-#EXPOSE 80
-#EXPOSE 443
-#WORKDIR /app
-#COPY --from=publish /app/publish .
-#ENTRYPOINT ["dotnet", "WebUI.dll"]
+# Set the entry point to run the application (Without db migrations)
+ENTRYPOINT ["dotnet", "WebUI.dll"]
