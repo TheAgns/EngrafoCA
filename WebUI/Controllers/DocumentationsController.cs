@@ -102,6 +102,13 @@ namespace WebUI.Controllers
         {
             var result = await _sender.Send(command);
 
+            if (result.IsError)
+            {
+				var errorViewModel = new ErrorViewModel(result.FirstError.Code, result.FirstError.Description);
+				TempData["ErrorViewModel"] = System.Text.Json.JsonSerializer.Serialize(errorViewModel);
+				return RedirectToAction("Error", "Error");
+			}
+
             return RedirectToAction("Details", new { Id = result });
         }
 

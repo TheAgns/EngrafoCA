@@ -26,6 +26,11 @@ namespace Application
 				typeof(IPipelineBehavior<,>), 
 				typeof(ValidationBehavior<,>));
 
+			// Logging Interceptor using MediatR pipeline
+			services.AddScoped(
+				typeof(IPipelineBehavior<,>),
+				typeof(RequestLogPipelineBehavior<,>));
+
 			// FluentValidation
 			services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 			

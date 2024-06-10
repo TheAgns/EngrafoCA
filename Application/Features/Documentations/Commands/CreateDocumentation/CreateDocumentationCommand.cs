@@ -33,6 +33,7 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 
 		public async Task<ErrorOr<Guid>> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
 		{
+			// Domain event is added upon creation
             var doc = Documentation.Create(
 				name: request.Name,
 				templateId: DocumentationTemplateId.New(request.DocumentationTemplateId),				
@@ -47,6 +48,7 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 
 			await _context.Documentations.AddAsync(doc);
 
+			// Domain Event is published on SaveChangesAsync
 			var numOfEntries = await _context.SaveChangesAsync(cancellationToken);
 
 			if (numOfEntries != 1)

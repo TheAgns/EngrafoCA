@@ -2,17 +2,22 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Serilog;
 
 namespace Infrastructure.Interceptors
 {
 	public class PublishDomainEventsInterceptor : SaveChangesInterceptor
 	{
 		private readonly IPublisher _publisher;
+		private readonly ILogger _logger;
 
-        public PublishDomainEventsInterceptor(IPublisher publisher)
+        public PublishDomainEventsInterceptor(IPublisher publisher, ILogger logger)
         {
             _publisher = publisher;
+			_logger = logger;
         }
+
+		// Automatically publishes domain events upon calling the saveChangesAsync method
         public async override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
 		{
 			await PublishDomainEvents(eventData.Context);
@@ -38,8 +43,10 @@ namespace Infrastructure.Interceptors
 			entities.ForEach(entity => entity.ClearDomainEvents());
 
 			// Then we publish the domainEvents that we extracted
-			foreach ( var domainEvent in domainEvents)
+			foreach (var domainEvent in domainEvents)
 			{
+				var eventType = typeof(IDomainEvent).Assembly.GetName().Name;
+				_logger.Information("Publishing Domain Event: {eventType}", eventType);
 				await _publisher.Publish(domainEvent);
 			}
 

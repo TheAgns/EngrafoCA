@@ -5,6 +5,7 @@ using Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 
 namespace Infrastructure
@@ -26,6 +27,8 @@ namespace Infrastructure
 			services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
 			services.AddScoped<PublishDomainEventsInterceptor>();
+
+			services.AddSingleton(Log.Logger);
 
 			return services;
 		}
