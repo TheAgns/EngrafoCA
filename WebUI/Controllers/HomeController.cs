@@ -14,14 +14,15 @@ namespace WebUI.Controllers
 
 		public IActionResult Home()
         {
-            _logger.LogInformation("LOG TEST");
+            _logger.LogInformation("Home Page Log");
             return View("Home");
         }
 
         [HttpGet]
         public IActionResult Privacy()
         {
-            return View();
+			_logger.LogInformation("Privacy Page Log");
+			return View();
         }
     }
 }
