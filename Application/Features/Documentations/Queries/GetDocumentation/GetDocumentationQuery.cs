@@ -21,12 +21,10 @@ namespace Application.Features.Documentations.Queries.GetDocumentation
 	{
 		private readonly IApplicationDbContext _context;
 		private readonly IMapper _mapper;
-		private ILogger<GetDocumentationQueryHandler> _logger;
-		public GetDocumentationQueryHandler(IApplicationDbContext context, IMapper mapper, ILogger<GetDocumentationQueryHandler> logger)
+		public GetDocumentationQueryHandler(IApplicationDbContext context, IMapper mapper)
 		{
 			_context = context;
 			_mapper = mapper;
-			_logger = logger;
 		}
 		public async Task<ErrorOr<DocumentationDto>> Handle(GetDocumentationQuery request, CancellationToken cancellationToken)
 		{

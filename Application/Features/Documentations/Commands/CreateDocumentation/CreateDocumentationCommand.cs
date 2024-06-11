@@ -26,12 +26,10 @@ namespace Application.Features.Documentations.Commands.CreateDocumentation
 	public class CreateDocumentationCommandHandler : IRequestHandler<CreateDocumentationCommand, ErrorOr<Guid>>
 	{
 		private readonly IApplicationDbContext _context;
-		private readonly ILogger<CreateDocumentationCommandHandler> _logger;
 
-		public CreateDocumentationCommandHandler(IApplicationDbContext context, ILogger<CreateDocumentationCommandHandler> logger)
+		public CreateDocumentationCommandHandler(IApplicationDbContext context)
 		{
 			_context = context;
-			_logger = logger;
 		}
 
 		public async Task<ErrorOr<Guid>> Handle(CreateDocumentationCommand request, CancellationToken cancellationToken)
