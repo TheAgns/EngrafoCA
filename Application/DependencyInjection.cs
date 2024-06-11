@@ -27,7 +27,7 @@ namespace Application
 				typeof(IPipelineBehavior<,>), 
 				typeof(ValidationBehavior<,>));
 
-			services.AddSerilog();
+			//services.AddSerilog();
 
 			// Logging Interceptor using MediatR pipeline
 			services.AddScoped(
