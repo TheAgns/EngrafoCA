@@ -15,9 +15,7 @@ builder.Services
 
 //! Logging
 builder.Host.UseSerilog((context, services, configuration) =>
-{
-	configuration.ReadFrom.Configuration(context.Configuration);
-});
+	configuration.ReadFrom.Configuration(context.Configuration));
 
 //! API
 builder.Services.AddControllersWithViews();
