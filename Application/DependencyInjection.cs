@@ -22,17 +22,15 @@ namespace Application
 			// MediatR
 			services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
-			// Validation Interceptor using MediatR pipeline
-			services.AddScoped(
-				typeof(IPipelineBehavior<,>), 
-				typeof(ValidationBehavior<,>));
-
-			//services.AddSerilog();
-
 			// Logging Interceptor using MediatR pipeline
 			services.AddScoped(
 				typeof(IPipelineBehavior<,>),
 				typeof(RequestLogPipelineBehavior<,>));
+
+			// Validation Interceptor using MediatR pipeline
+			services.AddScoped(
+				typeof(IPipelineBehavior<,>), 
+				typeof(ValidationBehavior<,>));			
 
 			// FluentValidation
 			services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
