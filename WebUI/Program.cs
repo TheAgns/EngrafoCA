@@ -1,6 +1,7 @@
 using Application;
 using Infrastructure;
 using Infrastructure.Data;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using WebUI.Middleware;
@@ -13,8 +14,15 @@ builder.Services
 	.AddInfrastructure(builder.Configuration);
 
 //! Logging
-builder.Host.UseSerilog((context, configuration) =>
-	configuration.ReadFrom.Configuration(context.Configuration));
+builder.Services.AddApplicationInsightsTelemetry();
+
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+	configuration.ReadFrom.Configuration(context.Configuration)
+				 .WriteTo.Console()
+				 .WriteTo.ApplicationInsights(services.GetRequiredService<TelemetryConfiguration>(), TelemetryConverter.Traces);
+});
 
 //! API
 builder.Services.AddControllersWithViews();
