@@ -12,7 +12,6 @@ namespace Application.Features.Documentations.Queries.GetDocumentations
     {
     }
 
-    // Handler
     public class GetDocumentationsQueryHandler(IApplicationDbContext context, IMapper mapper) : IRequestHandler<GetDocumentationsQuery, ErrorOr<List<DocumentationDto>>>
     {
         private readonly IApplicationDbContext _context = context;
