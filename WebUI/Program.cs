@@ -14,14 +14,9 @@ builder.Services
 	.AddInfrastructure(builder.Configuration);
 
 //! Logging
-builder.Services.AddApplicationInsightsTelemetry();
-
-
 builder.Host.UseSerilog((context, services, configuration) =>
 {
-	configuration.ReadFrom.Configuration(context.Configuration)
-				 .WriteTo.Console()
-				 .WriteTo.ApplicationInsights(services.GetRequiredService<TelemetryConfiguration>(), TelemetryConverter.Traces);
+	configuration.ReadFrom.Configuration(context.Configuration);
 });
 
 //! API
